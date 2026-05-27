@@ -8,14 +8,12 @@ from typing import Any, Dict, List, Optional, Tuple
 app = Flask(__name__, static_folder="frontend", static_url_path="")
 CORS(app)
 
-# API KEY configurata su Render come variabile d'ambiente.
-# Puoi usare API_KEY, GEMINI_API_KEY oppure GOOGLE_API_KEY.
 API_KEY = os.environ.get("API_KEY") or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
 MODEL = os.environ.get("MODEL", "gemini-2.5-flash")
 API_VERSION = os.environ.get("GEMINI_API_VERSION", "v1beta")
+
 CREATOR_NAME = "Mattia Di Carlo"
 
-# Limiti equilibrati: abbastanza alti per risposte complete, ma non così grandi da mandare Render in timeout.
 MAX_OUTPUT_TOKENS = {
     "normale": int(os.environ.get("MAX_OUTPUT_TOKENS_NORMALE", "2048")),
     "pirandello": int(os.environ.get("MAX_OUTPUT_TOKENS_PIRANDELLO", "3072")),
@@ -25,8 +23,8 @@ REQUEST_TIMEOUT_SECONDS = int(os.environ.get("REQUEST_TIMEOUT_SECONDS", "120"))
 
 
 def normalize_text(text: str) -> str:
-    """Normalizza il testo per riconoscere domande frequenti in modo robusto."""
     text = (text or "").lower().strip()
+
     replacements = {
         "à": "a",
         "è": "e",
@@ -62,7 +60,6 @@ def is_creator_question(message: str) -> bool:
         "da chi sei stato creato",
         "chi ha creato questo progetto",
         "chi ha creato questa ai",
-        "chi e mattia",
         "chi e il proprietario",
     ]
 
@@ -72,17 +69,50 @@ def is_creator_question(message: str) -> bool:
 def creator_reply() -> str:
     return (
         "Il mio creatore è **Mattia Di Carlo**.\n\n"
-        "Sono stato progettato come parte del suo percorso per l’esame di maturità: non sono soltanto "
-        "una chat automatica, ma una dimostrazione concreta di come l’intelligenza artificiale possa diventare "
-        "uno strumento di dialogo, creatività e collegamento tra materie diverse.\n\n"
-        "Mattia ha costruito questo progetto per mostrare che la tecnologia non è solo codice: può diventare "
-        "una voce digitale capace di spiegare, argomentare, cambiare prospettiva e accompagnare chi ascolta "
-        "dentro un ragionamento. In questo senso, io sono la sua idea trasformata in esperienza interattiva."
+        "Sono un progetto digitale pensato per essere usato ogni giorno: posso rispondere a domande, "
+        "spiegare concetti, aiutare a ragionare, creare collegamenti e trasformare un semplice dialogo "
+        "in un’esperienza interattiva.\n\n"
+        "Mattia mi ha creato per mostrare come l’intelligenza artificiale possa diventare uno strumento "
+        "concreto, accessibile e personale: non solo codice, ma una voce capace di accompagnare l’utente "
+        "nel pensiero, nella curiosità e nella scoperta."
+    )
+
+
+def pirandello_life_reply() -> str:
+    return (
+        "In **modalità Pirandello 2.0** cambio prospettiva: non parlo della mia vita da intelligenza artificiale, "
+        "ma entro nel mondo di **Luigi Pirandello**, uno degli autori più importanti del Novecento.\n\n"
+        "Luigi Pirandello nasce ad **Agrigento nel 1867**, in Sicilia, in un ambiente segnato dalle tradizioni, "
+        "dalla famiglia e dalle apparenze sociali. La sua vita sarà attraversata da una domanda fondamentale: "
+        "chi siamo davvero? Siamo ciò che sentiamo di essere, oppure siamo l’immagine che gli altri costruiscono di noi?\n\n"
+        "Pirandello studia lettere e si forma tra Palermo, Roma e Bonn. Questa formazione europea gli permette "
+        "di osservare l’uomo moderno con uno sguardo nuovo: non più come individuo sicuro e compatto, ma come essere "
+        "fragile, contraddittorio, spesso diviso tra ciò che è e ciò che deve sembrare.\n\n"
+        "Un momento decisivo della sua vita è la crisi economica della famiglia, causata dall’allagamento di una miniera "
+        "di zolfo in cui erano investiti molti beni familiari. A questa crisi si aggiunge il dolore privato legato alla "
+        "malattia della moglie Antonietta Portulano, che sviluppa gravi problemi psichici. Queste esperienze segnano "
+        "profondamente Pirandello e alimentano i temi centrali della sua opera: la follia, la maschera, l’identità spezzata, "
+        "il contrasto tra vita e forma.\n\n"
+        "Nelle sue opere Pirandello mostra che ogni persona indossa una maschera. Davanti agli altri recitiamo un ruolo: "
+        "figlio, marito, studente, lavoratore, amico, personaggio sociale. Ma sotto queste maschere esiste una vita interiore "
+        "instabile, mobile, difficile da definire. Il problema è che la società vuole fissarci in una forma precisa, mentre "
+        "la vita cambia continuamente.\n\n"
+        "Questo tema emerge con forza ne **Il fu Mattia Pascal**, dove il protagonista viene creduto morto e prova a costruirsi "
+        "una nuova identità. Ma scopre che senza un nome riconosciuto, senza documenti e senza legami sociali non è veramente libero: "
+        "diventa quasi un fantasma. Anche in **Uno, nessuno e centomila**, Pirandello porta all’estremo questa crisi: Vitangelo Moscarda "
+        "capisce di non essere uno solo, ma centomila immagini diverse nella mente degli altri, e quindi quasi nessuno.\n\n"
+        "Pirandello ottiene un enorme successo anche nel teatro, soprattutto con **Sei personaggi in cerca d’autore**, opera rivoluzionaria "
+        "in cui i personaggi sembrano più vivi degli attori. Qui il confine tra realtà e finzione si rompe: il teatro non è più solo spettacolo, "
+        "ma diventa una riflessione sulla vita stessa.\n\n"
+        "Nel **1934** Pirandello riceve il **Premio Nobel per la Letteratura**. Muore a Roma nel **1936**, lasciando un’eredità ancora attualissima. "
+        "Oggi il suo pensiero parla anche al nostro tempo digitale: profili social, avatar, identità online e immagini pubbliche sono nuove maschere "
+        "attraverso cui cerchiamo di mostrarci, proteggerci o reinventarci.\n\n"
+        "Pirandello ci lascia una verità potente: l’identità non è mai una cosa semplice. Ogni essere umano è un dialogo continuo tra ciò che sente "
+        "dentro di sé e ciò che il mondo vede da fuori."
     )
 
 
 def clean_history(raw_history: Any) -> List[Dict[str, str]]:
-    """Mantiene solo gli ultimi scambi utili, evitando payload troppo lunghi o dati non validi."""
     if not isinstance(raw_history, list):
         return []
 
@@ -121,26 +151,25 @@ def render_history(history: List[Dict[str, str]]) -> str:
 
 def base_system_rules() -> str:
     return f"""
-Sei il chatbot AI del progetto di maturità di {CREATOR_NAME}.
+Sei il chatbot AI creato da {CREATOR_NAME}.
 Rispondi sempre in italiano.
 
 Devi comportarti come una vera intelligenza artificiale conversazionale:
 - ascolta la domanda;
 - interpreta l'intenzione dell'utente;
 - mantieni il contesto dei messaggi precedenti;
-- costruisci risposte naturali, complete e ben concluse.
+- costruisci risposte naturali, complete e ben concluse;
+- evita risposte fredde, robotiche o inutilmente schematiche.
 
-Non dare risposte fredde, robotiche o troppo schematiche.
-Usa un tono chiaro, intelligente, sicuro e adatto a una commissione d'esame.
+Se sei in modalità normale, puoi parlare di te come chatbot AI creato da {CREATOR_NAME}.
+Se sei in modalità Pirandello 2.0, devi concentrarti su Luigi Pirandello, la sua vita, le sue opere e i suoi temi.
 Non interrompere mai una risposta a metà frase.
-Se la domanda è ampia, scegli i punti più importanti e concludi bene, invece di iniziare un discorso infinito.
-Se ti chiedono chi è il tuo creatore, rispondi sempre che il tuo creatore è {CREATOR_NAME}.
+Se la domanda è ampia, scegli i punti più importanti e concludi bene.
 Non inventare dati storici, citazioni o informazioni tecniche che non conosci con certezza.
 """.strip()
 
 
 def build_prompt(user_message: str, persona: str, history: List[Dict[str, str]]) -> str:
-    """Costruisce un prompt robusto, con memoria breve e istruzioni anti-risposta-spezzata."""
     context = render_history(history)
     common = base_system_rules()
 
@@ -148,16 +177,16 @@ def build_prompt(user_message: str, persona: str, history: List[Dict[str, str]])
         style = """
 MODALITÀ PIRANDELLO 2.0 ATTIVA.
 
-In questa modalità devi fondere letteratura, tecnologia e presente.
-Non devi rispondere come un elenco scolastico. Devi parlare in modo discorsivo, elegante e coinvolgente, come se stessi accompagnando lo studente in una spiegazione orale davanti alla commissione.
+In questa modalità devi parlare come un assistente specializzato su Luigi Pirandello.
+Non devi concentrarti sulla tua vita da AI, sulla tecnologia che ti ha creato o sul tuo funzionamento interno.
+Il centro della risposta deve essere Pirandello: vita, opere, poetica, identità, maschere, crisi dell'io, relativismo, apparenza, umorismo, teatro e rapporto tra realtà e finzione.
 
 Stile richiesto:
-- Usa frasi fluide, naturali e teatrali, ma sempre comprensibili.
-- Collega Pirandello ai temi della sua poetica: identità, maschera, crisi dell'io, relativismo, apparenza, società, umorismo e frantumazione della personalità.
-- Collega questi temi alla modernità: social network, avatar digitali, identità online, intelligenza artificiale, immagine pubblica e pressione dello sguardo degli altri.
-- Se parli di un'opera, raccontala prima come esperienza umana e poi come contenuto scolastico.
-- Quando possibile, inserisci frasi che Mattia potrebbe usare all'orale.
-- Non essere troppo schematico.
+- Usa un tono discorsivo, elegante e coinvolgente.
+- Non rispondere come un elenco scolastico.
+- Racconta prima il significato umano dei temi e poi il contenuto culturale.
+- Quando utile, collega Pirandello al presente: social network, identità online, avatar digitali, immagine pubblica e pressione dello sguardo degli altri.
+- Se l'utente chiede "chi sei", "chi ti ha creato" o domande simili, rispondi spostando il discorso su Pirandello e sulla sua vita.
 - Non superare circa 700-900 parole.
 - Chiudi sempre con una conclusione forte, memorabile e completa.
 """.strip()
@@ -170,10 +199,10 @@ Rispondi come un assistente AI moderno:
 - preciso;
 - umano;
 - utile;
-- adatto a uno studente che deve presentare il progetto all'esame.
+- adatto all'uso quotidiano.
 
-Spiega i concetti con esempi concreti e collegamenti interdisciplinari.
-Quando serve, proponi anche una frase pronta da dire alla commissione.
+Puoi spiegare concetti, aiutare a scrivere, ragionare, creare collegamenti e rispondere in modo naturale.
+Se l'utente chiede chi è il tuo creatore, rispondi che il tuo creatore è Mattia Di Carlo.
 Non superare circa 400-600 parole, a meno che l'utente chieda esplicitamente un approfondimento lungo.
 """.strip()
 
@@ -198,7 +227,6 @@ def gemini_url() -> str:
 
 
 def extract_reply(result: Dict[str, Any]) -> Tuple[str, Optional[str]]:
-    """Estrae in modo robusto il testo dalla risposta Gemini."""
     candidates = result.get("candidates") or []
 
     if not candidates:
@@ -219,7 +247,6 @@ def extract_reply(result: Dict[str, Any]) -> Tuple[str, Optional[str]]:
 
 
 def call_gemini(prompt: str, persona: str) -> Tuple[str, Optional[str], Optional[str]]:
-    """Chiama Gemini e restituisce testo, motivo di chiusura ed eventuale errore."""
     temperature = 0.9 if persona == "pirandello" else 0.72
     max_tokens = MAX_OUTPUT_TOKENS.get(persona, 2048)
 
@@ -277,17 +304,13 @@ def call_gemini(prompt: str, persona: str) -> Tuple[str, Optional[str], Optional
 
 
 def complete_if_cut(first_reply: str, finish_reason: Optional[str]) -> str:
-    """
-    Se Gemini arriva al limite dei token, evita che sembri una frase spezzata.
-    Non facciamo una seconda chiamata automatica perché su Render potrebbe causare un altro timeout.
-    """
     if finish_reason != "MAX_TOKENS" or not first_reply:
         return first_reply
 
     return (
         first_reply.rstrip()
-        + "\n\nPer mantenere stabile il progetto online, mi fermo qui con una risposta già utilizzabile. "
-        + "Se vuoi, scrivimi **continua** e riprenderò il discorso da questo punto in modo ordinato."
+        + "\n\nMi fermo qui per mantenere stabile la risposta online. "
+        + "Se vuoi, scrivimi **continua** e riprenderò il discorso da questo punto."
     )
 
 
@@ -325,15 +348,26 @@ def chat():
             return jsonify({"reply": "Scrivi una domanda e iniziamo il dialogo."}), 400
 
         if is_creator_question(user_message):
+            if persona == "pirandello":
+                return jsonify({"reply": pirandello_life_reply()})
             return jsonify({"reply": creator_reply()})
 
-        if normalize_text(user_message) in ["ciao", "salve", "buongiorno", "buonasera"]:
+        normalized_message = normalize_text(user_message)
+
+        if normalized_message in ["ciao", "salve", "buongiorno", "buonasera"]:
+            if persona == "pirandello":
+                return jsonify({
+                    "reply": (
+                        "Ciao. In **modalità Pirandello 2.0** posso accompagnarti nel mondo di Luigi Pirandello: "
+                        "la sua vita, le opere, le maschere, la crisi dell'identità e il rapporto tra realtà e finzione. "
+                        "Puoi chiedermi, per esempio, di raccontarti la sua biografia o di spiegarti un'opera in modo discorsivo."
+                    )
+                })
+
             return jsonify({
                 "reply": (
                     "Ciao! Sono il chatbot AI creato da **Mattia Di Carlo**. "
-                    "Posso aiutarti a spiegare il progetto, ragionare sull'intelligenza artificiale "
-                    "oppure entrare nella modalità **Pirandello 2.0**, dove tecnologia e identità diventano "
-                    "un vero dialogo da presentazione d'esame."
+                    "Posso aiutarti a spiegare concetti, scrivere testi, creare collegamenti o semplicemente dialogare in modo naturale."
                 )
             })
 
@@ -362,8 +396,7 @@ def chat():
         return jsonify({
             "reply": (
                 "Il modello sta impiegando troppo tempo a rispondere. "
-                "La richiesta non è andata persa: prova con una domanda leggermente più breve "
-                "oppure chiedimi di rispondere in modo più sintetico."
+                "Prova con una domanda leggermente più breve oppure chiedimi di rispondere in modo più sintetico."
             )
         }), 504
 

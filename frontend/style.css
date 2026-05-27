@@ -420,7 +420,7 @@ select {
 }
 
 .message.system::before {
-    content: "Presentazione";
+    content: "Sistema";
     color: var(--accent-deep);
 }
 

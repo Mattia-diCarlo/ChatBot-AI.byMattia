@@ -16,8 +16,13 @@ const personaContent = {
 };
 
 const localReplies = {
-    creator: "Il mio creatore è **Mattia Di Carlo**.\n\nSono stato progettato come parte del suo percorso per l’esame di maturità: non sono soltanto una chat automatica, ma una dimostrazione concreta di come l’intelligenza artificiale possa diventare uno strumento di dialogo, creatività e collegamento tra materie diverse.\n\nMattia ha costruito questo progetto per mostrare che la tecnologia non è solo codice: può diventare una voce digitale capace di spiegare, argomentare, cambiare prospettiva e accompagnare chi ascolta dentro un ragionamento.",
-    ciao: "Ciao! Sono il chatbot AI creato da **Mattia Di Carlo**. Posso aiutarti a spiegare il progetto, ragionare sull’intelligenza artificiale oppure entrare nella modalità **Pirandello 2.0**, dove tecnologia e identità diventano un vero dialogo da presentazione d’esame."
+    creator: "Il mio creatore è **Mattia Di Carlo**.\n\nSono un progetto digitale pensato per essere usato ogni giorno: posso rispondere a domande, spiegare concetti, aiutare a ragionare, creare collegamenti e trasformare un semplice dialogo in un’esperienza interattiva.\n\nMattia mi ha creato per mostrare come l’intelligenza artificiale possa diventare uno strumento concreto, accessibile e personale: non solo codice, ma una voce capace di accompagnare l’utente nel pensiero, nella curiosità e nella scoperta.",
+
+    pirandelloLife: "In **modalità Pirandello 2.0** cambio prospettiva: non parlo della mia vita da intelligenza artificiale, ma entro nel mondo di **Luigi Pirandello**.\n\nLuigi Pirandello nasce ad **Agrigento nel 1867**, in Sicilia, in un ambiente segnato dalle tradizioni, dalla famiglia e dalle apparenze sociali. La sua vita sarà attraversata da una domanda fondamentale: chi siamo davvero? Siamo ciò che sentiamo di essere, oppure siamo l’immagine che gli altri costruiscono di noi?\n\nPirandello studia lettere e si forma tra Palermo, Roma e Bonn. Questa formazione europea gli permette di osservare l’uomo moderno con uno sguardo nuovo: non più come individuo sicuro e compatto, ma come essere fragile, contraddittorio, spesso diviso tra ciò che è e ciò che deve sembrare.\n\nUn momento decisivo della sua vita è la crisi economica della famiglia, causata dall’allagamento di una miniera di zolfo in cui erano investiti molti beni familiari. A questa crisi si aggiunge il dolore privato legato alla malattia della moglie Antonietta Portulano, che sviluppa gravi problemi psichici. Queste esperienze segnano profondamente Pirandello e alimentano i temi centrali della sua opera: la follia, la maschera, l’identità spezzata, il contrasto tra vita e forma.\n\nNelle sue opere Pirandello mostra che ogni persona indossa una maschera. Davanti agli altri recitiamo un ruolo: figlio, marito, studente, lavoratore, amico, personaggio sociale. Ma sotto queste maschere esiste una vita interiore instabile, mobile, difficile da definire. Il problema è che la società vuole fissarci in una forma precisa, mentre la vita cambia continuamente.\n\nNel **1934** Pirandello riceve il **Premio Nobel per la Letteratura**. Muore a Roma nel **1936**, lasciando un’eredità ancora attualissima. Oggi il suo pensiero parla anche al nostro tempo digitale: profili social, avatar, identità online e immagini pubbliche sono nuove maschere attraverso cui cerchiamo di mostrarci, proteggerci o reinventarci.",
+
+    ciaoNormale: "Ciao! Sono il chatbot AI creato da **Mattia Di Carlo**. Posso aiutarti a spiegare concetti, scrivere testi, creare collegamenti o semplicemente dialogare in modo naturale.",
+
+    ciaoPirandello: "Ciao. In **modalità Pirandello 2.0** posso accompagnarti nel mondo di Luigi Pirandello: la sua vita, le opere, le maschere, la crisi dell'identità e il rapporto tra realtà e finzione."
 };
 
 function setPersona(value) {
@@ -30,8 +35,8 @@ function setPersona(value) {
     document.getElementById("modeTitle").innerText = content.title;
 
     const systemText = value === "pirandello"
-        ? "Modalità Pirandello 2.0 attivata: ora il chatbot risponderà in modo più discorsivo, teatrale e collegato al tema dell'identità."
-        : "Modalità normale attivata: risposte chiare, moderne e adatte alla presentazione del progetto.";
+        ? "Modalità Pirandello 2.0 attivata: ora il chatbot parlerà soprattutto di Luigi Pirandello, della sua vita, delle sue opere e del tema dell'identità."
+        : "Modalità normale attivata: il chatbot risponde come assistente AI quotidiano creato da Mattia Di Carlo.";
 
     addMessage(systemText, "system");
 }
@@ -162,7 +167,7 @@ function clearChat() {
     conversationHistory = [];
 
     addMessage(
-        "Nuova conversazione avviata. Sono pronto: puoi chiedermi di spiegare il progetto, l’intelligenza artificiale o la modalità Pirandello 2.0.",
+        "Nuova conversazione avviata. Puoi chiedermi qualcosa in modalità normale oppure attivare Pirandello 2.0 per parlare di vita, opere e identità.",
         "system"
     );
 
@@ -186,14 +191,22 @@ async function sendMessage() {
     const normalized = normalize(text);
 
     if (["ciao", "salve", "buongiorno", "buonasera"].includes(normalized)) {
-        addMessage(localReplies.ciao, "ai");
-        remember("ai", localReplies.ciao);
+        const reply = persona === "pirandello"
+            ? localReplies.ciaoPirandello
+            : localReplies.ciaoNormale;
+
+        addMessage(reply, "ai");
+        remember("ai", reply);
         return;
     }
 
     if (isCreatorQuestion(text)) {
-        addMessage(localReplies.creator, "ai");
-        remember("ai", localReplies.creator);
+        const reply = persona === "pirandello"
+            ? localReplies.pirandelloLife
+            : localReplies.creator;
+
+        addMessage(reply, "ai");
+        remember("ai", reply);
         return;
     }
 
@@ -235,7 +248,7 @@ async function sendMessage() {
 
 document.addEventListener("DOMContentLoaded", () => {
     addMessage(
-        "Benvenuto. Sono il chatbot AI creato da **Mattia Di Carlo**: posso spiegare il progetto, collegare l’intelligenza artificiale alle materie d’esame e trasformare Pirandello in un dialogo moderno sull’identità.",
+        "Benvenuto. Sono il chatbot AI creato da **Mattia Di Carlo**. Puoi usarmi per dialogare, chiarire concetti, creare collegamenti o esplorare la modalità **Pirandello 2.0**.",
         "system"
     );
 
