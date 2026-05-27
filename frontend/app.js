@@ -25,6 +25,7 @@ function setPersona(value) {
     document.body.dataset.persona = value;
 
     const content = personaContent[value] || personaContent.normale;
+
     document.querySelector(".mode-icon").innerText = content.icon;
     document.getElementById("modeTitle").innerText = content.title;
 
@@ -47,6 +48,7 @@ function normalize(text) {
 
 function isCreatorQuestion(text) {
     const msg = normalize(text);
+
     return [
         "chi e il tuo creatore",
         "chi ti ha creato",
@@ -85,27 +87,37 @@ function trimHistory() {
 }
 
 function remember(role, content) {
-    conversationHistory.push({ role, content: String(content || "").slice(0, 1800) });
+    conversationHistory.push({
+        role,
+        content: String(content || "").slice(0, 1800)
+    });
+
     trimHistory();
 }
 
 function addMessage(text, type = "ai") {
     const chat = document.getElementById("chat");
     const message = document.createElement("div");
+
     message.className = `message ${type}`;
     message.innerHTML = formatReply(text);
+
     chat.appendChild(message);
     scrollToBottom();
+
     return message;
 }
 
 function addTypingMessage() {
     const chat = document.getElementById("chat");
     const message = document.createElement("div");
+
     message.className = "message ai typing";
     message.innerHTML = "<span></span><span></span><span></span>";
+
     chat.appendChild(message);
     scrollToBottom();
+
     return message;
 }
 
@@ -116,32 +128,44 @@ function scrollToBottom() {
 
 function setLoading(value) {
     isSending = value;
+
     const button = document.getElementById("sendButton");
     const input = document.getElementById("input");
+
     button.disabled = value;
     input.disabled = value;
 }
 
 function usePrompt(text) {
     const input = document.getElementById("input");
+
     input.value = text;
     resizeTextarea();
     input.focus();
+
     sendMessage();
 }
 
 function resizeTextarea() {
     const input = document.getElementById("input");
+
     if (!input) return;
+
     input.style.height = "auto";
     input.style.height = Math.min(input.scrollHeight, 160) + "px";
 }
 
 function clearChat() {
     const chat = document.getElementById("chat");
+
     chat.innerHTML = "";
     conversationHistory = [];
-    addMessage("Nuova conversazione avviata. Sono pronto: puoi chiedermi di spiegare il progetto, l’intelligenza artificiale o la modalità Pirandello 2.0.", "system");
+
+    addMessage(
+        "Nuova conversazione avviata. Sono pronto: puoi chiedermi di spiegare il progetto, l’intelligenza artificiale o la modalità Pirandello 2.0.",
+        "system"
+    );
+
     document.getElementById("input").focus();
 }
 
@@ -150,10 +174,12 @@ async function sendMessage() {
 
     const input = document.getElementById("input");
     const text = input.value.trim();
+
     if (!text) return;
 
     addMessage(text, "user");
     remember("user", text);
+
     input.value = "";
     resizeTextarea();
 
@@ -172,6 +198,7 @@ async function sendMessage() {
     }
 
     const typingMessage = addTypingMessage();
+
     setLoading(true);
 
     try {
@@ -189,11 +216,14 @@ async function sendMessage() {
 
         const data = await res.json();
         const reply = data.reply || "Non ho ricevuto una risposta valida.";
+
         typingMessage.classList.remove("typing");
         typingMessage.innerHTML = formatReply(reply);
+
         remember("ai", reply);
     } catch (err) {
         const errorText = "Errore di connessione con il server. Controlla che Flask sia avviato correttamente oppure guarda i log su Render.";
+
         typingMessage.classList.remove("typing");
         typingMessage.innerHTML = formatReply(errorText);
     } finally {
@@ -204,10 +234,15 @@ async function sendMessage() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    addMessage("Benvenuto. Sono il chatbot AI creato da **Mattia Di Carlo**: posso spiegare il progetto, collegare l’intelligenza artificiale alle materie d’esame e trasformare Pirandello in un dialogo moderno sull’identità.", "system");
+    addMessage(
+        "Benvenuto. Sono il chatbot AI creato da **Mattia Di Carlo**: posso spiegare il progetto, collegare l’intelligenza artificiale alle materie d’esame e trasformare Pirandello in un dialogo moderno sull’identità.",
+        "system"
+    );
 
     const input = document.getElementById("input");
+
     input.addEventListener("input", resizeTextarea);
+
     input.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();

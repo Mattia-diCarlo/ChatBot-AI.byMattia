@@ -6,9 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#f7f7f8">
     <title>Chatbot AI | Mattia Di Carlo</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link 
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" 
+        rel="stylesheet"
+    >
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -24,10 +29,14 @@
                     <div class="logo-mark" aria-hidden="true">
                         <span>AI</span>
                     </div>
+
                     <div>
                         <p class="eyebrow">Progetto Esame di Maturità</p>
                         <h1>ChatBot AI</h1>
-                        <p class="subtitle"><span class="status-dot"></span> Creato da Mattia Di Carlo</p>
+                        <p class="subtitle">
+                            <span class="status-dot"></span>
+                            Creato da Mattia Di Carlo
+                        </p>
                     </div>
                 </div>
 
@@ -45,7 +54,9 @@
                         </select>
                     </label>
 
-                    <button class="ghost-button" id="clearButton" type="button" onclick="clearChat()">Nuova chat</button>
+                    <button class="ghost-button" id="clearButton" type="button" onclick="clearChat()">
+                        Nuova chat
+                    </button>
                 </div>
             </header>
 
@@ -57,22 +68,40 @@
             </div>
 
             <div class="suggestions" id="suggestions" aria-label="Suggerimenti rapidi">
-                <button onclick="usePrompt('Chi è il tuo creatore?')">Chi è il tuo creatore?</button>
-                <button onclick="usePrompt('Spiegami la modalità Pirandello 2.0 in modo discorsivo')">Pirandello 2.0</button>
-                <button onclick="usePrompt('Collega intelligenza artificiale e identità')">AI e identità</button>
-                <button onclick="usePrompt('Parlami de Il fu Mattia Pascal come se dovessi spiegarlo alla commissione')">Il fu Mattia Pascal</button>
+                <button onclick="usePrompt('Chi è il tuo creatore?')">
+                    Chi è il tuo creatore?
+                </button>
+
+                <button onclick="usePrompt('Spiegami la modalità Pirandello 2.0 in modo discorsivo')">
+                    Pirandello 2.0
+                </button>
+
+                <button onclick="usePrompt('Collega intelligenza artificiale e identità')">
+                    AI e identità
+                </button>
+
+                <button onclick="usePrompt('Parlami de Il fu Mattia Pascal come se dovessi spiegarlo alla commissione')">
+                    Il fu Mattia Pascal
+                </button>
             </div>
 
             <div id="chat" aria-live="polite"></div>
 
             <footer class="input-area">
                 <div class="composer">
-                    <textarea id="input" rows="1" autocomplete="off" placeholder="Scrivi una domanda per l'orale..."></textarea>
+                    <textarea 
+                        id="input" 
+                        rows="1" 
+                        autocomplete="off" 
+                        placeholder="Scrivi una domanda per l'orale..."
+                    ></textarea>
+
                     <button id="sendButton" type="button" onclick="sendMessage()" aria-label="Invia messaggio">
                         <span>Invia</span>
                         <span class="button-arrow">↑</span>
                     </button>
                 </div>
+
                 <p class="input-hint">Invio per mandare · Shift + Invio per andare a capo</p>
             </footer>
         </section>
